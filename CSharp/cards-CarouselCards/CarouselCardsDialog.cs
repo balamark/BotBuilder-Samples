@@ -6,9 +6,20 @@
     using Microsoft.Bot.Builder.Dialogs;
     using Microsoft.Bot.Connector;
 
+    public enum MenuSequence
+    {
+        Initial = 0,
+        ShownMenu,
+        OrderTaken
+    };
+
     [Serializable]
     public class CarouselCardsDialog : IDialog<object>
     {
+        public MenuSequence menuSequence = MenuSequence.Initial;
+        public string order = "";
+        public string size = "";
+
         public async Task StartAsync(IDialogContext context)
         {
             context.Wait(this.MessageReceivedAsync);
@@ -16,13 +27,45 @@
 
         public virtual async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
         {
+            var activity = await result as Activity;
             var reply = context.MakeMessage();
 
-            reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-            reply.Attachments = GetCardsAttachments();
+            if(menuSequence == MenuSequence.Initial && (activity.Text.Contains("menu") || activity.Text.Contains("menus")))
+            {
+                reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                reply.Attachments = GetCardsAttachments();
+                reply.Text = "Here is our menu. Let me know what you want to order!";
+                menuSequence = MenuSequence.ShownMenu;
+            }
+            else if(menuSequence <= MenuSequence.ShownMenu && activity.Text.Contains("tea"))
+            {
+                reply.Text = "What size tea would you like?";
+                order = "tea";
+                menuSequence = MenuSequence.OrderTaken;
+            }
+            else if(menuSequence == MenuSequence.OrderTaken && (activity.Text.Contains("small") || activity.Text.Contains("medium") || activity.Text.Contains("large")))
+            {
+                size = activity.Text;
+                reply.Text = $"One {size} {order} coming up! Your total is $1 million dollars. Bye bye!";
+                menuSequence = MenuSequence.Initial;
+            }
+            else
+            {
+                if(menuSequence == MenuSequence.Initial)
+                {
+                    reply.Text = "Type menu to see our menu!";
+                }
+                else if(menuSequence == MenuSequence.ShownMenu)
+                {
+                    reply.Text = "Order a tea!";
+                }
+                else
+                {
+                    reply.Text = "Small, medium, or large?";
+                }
+            }
 
             await context.PostAsync(reply);
-
             context.Wait(this.MessageReceivedAsync);
         }
 
