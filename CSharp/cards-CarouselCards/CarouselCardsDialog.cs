@@ -79,6 +79,12 @@
                     "Store and help protect your data. Get durable, highly available data storage across the globe and pay only for what you use.",
                     new CardImage(url: "https://docs.microsoft.com/en-us/azure/storage/media/storage-introduction/storage-concepts.png"),
                     new CardAction(ActionTypes.OpenUrl, "Learn more", value: "https://azure.microsoft.com/en-us/services/storage/")),
+                GetHeroCard(
+                    "Jason's golf putter",
+                    "worth your money",
+                    "help you improve your putting skill",
+                    new CardImage(url: "http://www.antiqueclubs.com/images4/Putters401/LeadtopPutter401.jpg"),
+                    new CardAction(ActionTypes.OpenUrl, "Learn more", value: "https://azure.microsoft.com/en-us/services/storage/")),
                 GetThumbnailCard(
                     "DocumentDB",
                     "Blazing fast, planet-scale NoSQL",
