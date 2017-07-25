@@ -6,6 +6,7 @@
     using System.Web.Http;
     using Microsoft.Bot.Builder.Dialogs;
     using Microsoft.Bot.Connector;
+    using MultiDialogsBot.Dialogs;
 
     [BotAuthentication]
     public class MessagesController : ApiController
@@ -18,7 +19,7 @@
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                await Conversation.SendAsync(activity, () => new CarouselCardsDialog());
+                await Conversation.SendAsync(activity, () => new RootDialog());
             }
             else
             {

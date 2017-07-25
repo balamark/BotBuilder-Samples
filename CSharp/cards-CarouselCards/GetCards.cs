@@ -1,79 +1,19 @@
-﻿namespace CarouselCardsBot
+﻿using Microsoft.Bot.Connector;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using AdaptiveCards;
+
+namespace CarouselCardsBot
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using Microsoft.Bot.Builder.Dialogs;
-    using Microsoft.Bot.Connector;
-
-    public enum MenuSequence
+    public class GetCards
     {
-        Initial = 0,
-        ShownMenu,
-        OrderTaken
-    };
-
-    [Serializable]
-    public class CarouselCardsDialog : IDialog<object>
-    {
-        public MenuSequence menuSequence = MenuSequence.Initial;
-        public string order = "";
-        public string size = "";
-
-        public async Task StartAsync(IDialogContext context)
-        {
-            context.Wait(this.MessageReceivedAsync);
-        }
-
-        public virtual async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
-        {
-            var activity = await result as Activity;
-            var reply = context.MakeMessage();
-
-            if(menuSequence == MenuSequence.Initial && (activity.Text.Contains("menu") || activity.Text.Contains("menus")))
-            {
-                reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                reply.Attachments = GetCardsAttachments();
-                reply.Text = "Here is our menu. Let me know what you want to order!";
-                menuSequence = MenuSequence.ShownMenu;
-            }
-            else if(menuSequence <= MenuSequence.ShownMenu && activity.Text.Contains("tea"))
-            {
-                reply.Text = "What size tea would you like?";
-                order = "tea";
-                menuSequence = MenuSequence.OrderTaken;
-            }
-            else if(menuSequence == MenuSequence.OrderTaken && (activity.Text.Contains("small") || activity.Text.Contains("medium") || activity.Text.Contains("large")))
-            {
-                size = activity.Text;
-                reply.Text = $"One {size} {order} coming up! Your total is $1 million dollars. Bye bye!";
-                menuSequence = MenuSequence.Initial;
-            }
-            else
-            {
-                if(menuSequence == MenuSequence.Initial)
-                {
-                    reply.Text = "Type menu to see our menu!";
-                }
-                else if(menuSequence == MenuSequence.ShownMenu)
-                {
-                    reply.Text = "Order a tea!";
-                }
-                else
-                {
-                    reply.Text = "Small, medium, or large?";
-                }
-            }
-
-            await context.PostAsync(reply);
-            context.Wait(this.MessageReceivedAsync);
-        }
-
-        private static IList<Attachment> GetCardsAttachments()
+        public static IList<Attachment> GetCardsAttachments()
         {
             return new List<Attachment>()
             {
-                GetHeroCard(
+                GetThumbnailCard(
                     "Azure Storage",
                     "Offload the heavy lifting of data center management",
                     "Store and help protect your data. Get durable, highly available data storage across the globe and pay only for what you use.",
@@ -84,14 +24,16 @@
                     "worth your money",
                     "help you improve your putting skill",
                     new CardImage(url: "http://www.antiqueclubs.com/images4/Putters401/LeadtopPutter401.jpg"),
-                    new CardAction(ActionTypes.OpenUrl, "Learn more", value: "https://azure.microsoft.com/en-us/services/storage/")),
+                    new CardAction("quantity", "+1", value: 1),
+                    new CardAction("quantity", "+2", value: 2),
+                    new CardAction("quantity", "+3", value: 3)),
                 GetThumbnailCard(
                     "DocumentDB",
                     "Blazing fast, planet-scale NoSQL",
                     "NoSQL service for highly available, globally distributed apps—take full advantage of SQL and JavaScript over document and key-value data without the hassles of on-premises or virtual machine-based cloud database options.",
                     new CardImage(url: "https://docs.microsoft.com/en-us/azure/documentdb/media/documentdb-introduction/json-database-resources1.png"),
                     new CardAction(ActionTypes.OpenUrl, "Learn more", value: "https://azure.microsoft.com/en-us/services/documentdb/")),
-                GetHeroCard(
+                GetThumbnailCard(
                     "Azure Functions",
                     "Process events with a serverless code architecture",
                     "An event-based serverless compute experience to accelerate your development. It can scale based on demand and you pay only for the resources you consume.",
@@ -106,7 +48,7 @@
             };
         }
 
-        private static Attachment GetHeroCard(string title, string subtitle, string text, CardImage cardImage, CardAction cardAction)
+        private static Attachment GetHeroCard(string title, string subtitle, string text, CardImage cardImage, CardAction cardAction1, CardAction cardAction2, CardAction cardAction3)
         {
             var heroCard = new HeroCard
             {
@@ -114,7 +56,7 @@
                 Subtitle = subtitle,
                 Text = text,
                 Images = new List<CardImage>() { cardImage },
-                Buttons = new List<CardAction>() { cardAction },
+                Buttons = new List<CardAction>() { cardAction1, cardAction2, cardAction3 },
             };
 
             return heroCard.ToAttachment();
