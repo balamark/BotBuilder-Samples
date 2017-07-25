@@ -24,17 +24,10 @@
 
         public virtual async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
         {
-            //todo: after user press button, get the order count of each item
-            int cnt = -1;
-            var message = await result;
-            cnt = (int)message.Value;
-            await context.PostAsync("ok {cnt}");
-            //var activity = await result as Activity;
-            //var reply = context.MakeMessage();
-            //reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-            //reply.Attachments = GetCards.GetCardsAttachments();
+            await context.PostAsync("Your order has been placed! Let me know if you want to order again!");
 
-            //await context.PostAsync(reply);
+            // This will return us to RootDialog
+            context.Done(true);
         }
     }
 }

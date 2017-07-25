@@ -14,10 +14,10 @@ namespace CarouselCardsBot
         [Prompt("Please enter your delivery {&}")]
         public string Address { get; set; }
 
-        [Prompt("What is your phone number {&}?")]
+        [Prompt("What is your {&} number?")]
         public string Phone { get; set; }
 
-        [Prompt("What is your email address {&}?")]
-        public int Email { get; set; }
+        [Prompt("What is your {&} address?")]
+        public string Email { get; set; }
     }
 }
